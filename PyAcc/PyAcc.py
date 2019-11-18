@@ -6,83 +6,127 @@ This is a module to help handle accounting of any camp or short term event
 @author: Elucidator
 """
 import string
+import copy
 
 class Account():
     '''class to represent the Income and expenditure'''
-    
     def __init__(self,filename,filetype):
         file = open(filename,'r')
         self.data = file.readlines()
-        self.backup = file.readlines()
         file.close()
         if filetype == 'csv':
             for i in range(len(self.data)):
-                self.data[i] = self.data[i].strp('\n')
+                self.data[i] = self.data[i].strip('\n')
                 seperate = self.data[i].split(',')
                 self.data[i] = seperate
-        #other file type TO DO
+        # other file type TO DO
         self.col = dict()
-        self.row = dict()
+        self.version = []
+        self.version.append(copy.deepcopy(self.data))
+        self.time = []
+        # self.time.append(time.strftime("%Y/%m/%d %H:%M:%S", time.localtime()))
+        
     def __len__(self):
         '''
         return the size of data as form of (columns,rows)
         '''
         return (len(self.data[0]),len(self.data))
-    def __repr__(self,condition = None):
+    def __repr__(self):
         '''
-        methos to print data of this account
-        condition can be used to add condition 
+        methods to print data 
         '''
-        if condition == None:    
-            for line in self.data:
-                print(line)
-        #TO DO
-    def ColIndex(self,ColNum):
-        '''
-        method to choose a column as the index for searching
-        the choosen columns will be saved into the col and delete from data
-        '''
-        for elem in self.data[ColNum]:
-            # check if there are whitespace or repeat term
-            if self.data[ColNum].count(elem) > 1:
-                print('contain repeat elements. Please check again')
-                #print('含有重複項，請重新選擇所採用的行 或是檢查輸入資料')
-                self.col = dict()
-                break
-            if elem in string.whitespace:
-                print('contain white space. Please check again')
-                #print('含有空白，請重新選擇所採用的行 或是檢查輸入資料')
-                self.col = dict()
-                break
-            # assign the choosen column into self.col
-            self.col[elem] = self.data[ColNum].index(elem)
-        # delete the choosen column
-        if self.col != {}:
-            del self.data[ColNum]
-    def RowIndex(self,RowNum):
+        for line in self.data:
+            print(line)
+        return ''
+    def ColIndex(self,RowNum):
         '''
         method to choose a row as the index for searching
-        the choosen rows will be saved into the row and delete from data
+        the choosen row will be saved into the col and delete from data
+        RowNum : the index of row user want to use as index of column
         '''
-        # TO DO
-    def delete_row(self,*args):
+        for elem in self.data[RowNum]:
+            # check if there are whitespace or repeat term
+            if self.data[RowNum].count(elem) > 1:
+                self.col = dict()
+                raise Exception('it cant exist more than one same index')
+            if elem in string.whitespace:
+                self.col = dict()
+                raise Exception('it cant exist whitespace')
+            # assign the choosen column into self.col
+            self.col[elem] = self.data[RowNum].index(elem)
+        del self.data[RowNum]
+    def add_column(self,name = None,default = None):
         '''
-        method to delete the choosen row
+        method to add new column
+        default : the default for added elements
         '''
-        args = list(args)
-        args.sort()
-        try:
-            for i in range(len(args)):
-                del self.data[i]
-                for i in range(len(args)):
-                    args[i] -= 1
-        except TypeError:
-            print('the inupt row numbers must be integers not float or string\n')
-    
-    def add_column(self,name):
+        if name == None or type(name) == int or type(name) == float:
+            raise ValueError('Name of new column cant be None or integer or float')
+        if name not in self.col:
+            self.col[name] = len(self.col)
+            for row in self.data:
+                row.append(default)
+        else:
+            raise ValueError(f'{name} has been in columns')
+    def add_row(self,newData):
         '''
-        method to add new column name to this data
+        method to add a new row
+        newData : the added data
         '''
+        if type(newData) != list or type(newData) != tuple:
+            raise TypeError('newData type must be list or tuple',newData)
+        elif len(newData) != len(self.col):
+            raise KeyError('Length of newData is not equal to ',len(self.col))
+        else:
+            self.data.append(newData)
+    def del_row(self,RowNum):
+        '''
+        method to delete one row from data
+        RowNum : position of remove row
+        '''
+        if type(RowNum) != int:
+            raise TypeError('index must be integer')
+        elif (RowNum < 0 and len(self.data) + RowNum < 0) or (RowNum >= len(self.data)):
+            raise KeyError('index out of range ',f'range: 0 to {len(self.data)}')
+        del self.data[RowNum]
+    def del_col(self,ColNum):
+        '''
+        method to delete one column from data
+        ColNum : position of remove column
+        '''
+        if type(ColNum) != int:
+            raise TypeError('index must be integer')
+        elif (ColNum < 0 and len(self.col) + ColNum < 0) or (ColNum >= len(self.col)):
+            raise KeyError('index out of range',f'range: 0 to {len(self.col)}')
+        for line in self.data:
+            del line[ColNum]
+    def SumofCol(self,ColNum,condition = None):
+        '''
+        '''
+        if ColNum != int:
+            raise TypeError('index must be integer')
+        if condition = None:
+            Sum = 0
+            for row in self.data:
+                Sum += row[ColNum]
+        if condition != None:
+            
+    def search(row = None,column = None):
+        '''
+        method to search the data with determined row and column
+        or 
+        '''
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
