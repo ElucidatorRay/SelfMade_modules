@@ -126,21 +126,35 @@ class Account():
         for key in self.col:
             if self.col[key] > ColNum:
                 self.col[key] -= 1       
-    def condition_to_index(condition):
-        # TO DO
+    def condition_to_index(cond):
+        ''''''
+        for key in cond:
+            if type(cond[key]) != (tuple or str):
+                raise TypeError('condition must be tuple or str but ',key,':',cond[key])
+            elif type(cond[key]) == tuple:
+                try:
+                    cond = list(cond)
+                    cond[0] = float(cond[0])
+                    cond[1] = float(cond[1])
+                except:
+                    raise KeyError('if using tuple as condition,input must be (lowerbound,upperbount)')
+                    
+                    
+        
         return None
     def SumofCol(self,ColName,condition = None):
         '''
         Return the sum of a column with some special condition
         ColName : the target column's name,which must be a element in self.col
         condition : dictionary to choose data
-        
         '''
         if ColName not in self.col:
             raise KeyError('ColName is not a column')
         if condition == None:
             Sum = 0
             for row in self.data:
+                if type(row[self.col[ColName]]) != int or float:
+                    raise TypeError(f'{self.col[ColName]} is not a int or float data')
                 Sum += row[self.col[ColName]]
             return Sum
         if type(condition) == dict:
@@ -179,10 +193,8 @@ class Account():
         '''
         '''
 
-        
-        
-help(Account)
-        
+A = 55
+print(f'{A}')
         
         
         
